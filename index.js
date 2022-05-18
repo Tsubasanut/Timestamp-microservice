@@ -20,8 +20,7 @@ app.get("/", function (req, res) {
   res.sendFile(__dirname + "/views/index.html");
 });
 
-//mounting logger for all calls
-app.use(logCalls);
+// mounting date parsing
 app.use("/api/:reqInput", parseInput);
 app.get("/api/:reqInput", returnDateObj);
 
