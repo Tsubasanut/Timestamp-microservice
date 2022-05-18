@@ -49,26 +49,20 @@ var listener = app.listen(process.env.PORT, function () {
  */
 function parseInput(req, res, next) {
   let reqInput = req.params.reqInput.toString();
-  if (reqInput !== "") {
-    let parsedDate =
-      reqInput.match(/^[0-9]*$/) === null
-        ? new Date(reqInput)
-        : new Date(+reqInput);
+  let parsedDate =
+    reqInput.match(/^[0-9]*$/) === null
+      ? new Date(reqInput)
+      : new Date(+reqInput);
 
-    req.parsedDate = isNaN(parsedDate)
-      ? {
-          error: "Invalid Date",
-        }
-      : {
-          unix: parsedDate.getTime(),
-          utc: parsedDate.toUTCString(),
-        };
-  } else {
-    req.parsedDate = {
-      unix: Date.now(),
-      utc: new Date(Date.now()).toUTCString(),
-    };
-  }
+  req.parsedDate = isNaN(parsedDate)
+    ? {
+        error: "Invalid Date",
+      }
+    : {
+        unix: parsedDate.getTime(),
+        utc: parsedDate.toUTCString(),
+      };
+
   next();
 }
 
@@ -77,8 +71,9 @@ function returnDateObj(req, res) {
 }
 
 function returnCurrentDate(req, res) {
+  let dateNow = Date.now();
   res.json({
-    unix: Date.now(),
-    utc: new Date(Date.now()).toUTCString(),
+    unix: dateNow,
+    utc: new Date(dateNow).toUTCString(),
   });
 }
