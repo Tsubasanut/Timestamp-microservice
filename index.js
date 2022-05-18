@@ -23,6 +23,8 @@ app.get("/", function (req, res) {
 // mounting date parsing
 app.use("/api/:reqInput", parseInput);
 app.get("/api/:reqInput", returnDateObj);
+//empty parameter should just report current date
+app.get("/api/", returnCurrentDate);
 
 // your first API endpoint...
 app.get("/api/hello", function (req, res) {
@@ -30,6 +32,7 @@ app.get("/api/hello", function (req, res) {
 });
 
 // listen for requests :)
+//var listener = app.listen(3000, function () {
 var listener = app.listen(process.env.PORT, function () {
   console.log("Your app is listening on port " + listener.address().port);
 });
@@ -45,23 +48,37 @@ var listener = app.listen(process.env.PORT, function () {
  * @return None
  */
 function parseInput(req, res, next) {
-  let reqInput = req.params.reqInput;
-  let parsedDate;
-  if (reqInput.match(/^[0-9]*$/) === null) {
-    //it's a date
-    parsedDate = new Date(reqInput);
-  } else {
-    //it's a timestamp
-    parsedDate = new Date(+reqInput);
-  }
+  let reqInput = req.params.reqInput.toString();
+  if (reqInput !== "") {
+    let parsedDate =
+      reqInput.match(/^[0-9]*$/) === null
+        ? new Date(reqInput)
+        : new Date(+reqInput);
 
-  req.parsedDate = {
-    unix: parsedDate.getTime(),
-    utc: parsedDate,
-  };
+    req.parsedDate = isNaN(parsedDate)
+      ? {
+          error: "Invalid Date",
+        }
+      : {
+          unix: parsedDate.getTime(),
+          utc: parsedDate.toUTCString(),
+        };
+  } else {
+    req.parsedDate = {
+      unix: Date.now(),
+      utc: new Date(Date.now()).toUTCString(),
+    };
+  }
   next();
 }
 
 function returnDateObj(req, res) {
   res.json(req.parsedDate);
+}
+
+function returnCurrentDate(req, res) {
+  res.json({
+    unix: Date.now(),
+    utc: new Date(Date.now()).toUTCString(),
+  });
 }
